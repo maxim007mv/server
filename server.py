@@ -5,17 +5,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
-# Telegram credentials (must be provided via env vars)
+
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN", "")
 TG_CHAT_ID = os.getenv("TG_CHAT_ID", "")
 
-# Optional simple auth for incoming requests (set TG_INBOUND_SECRET env if needed)
+
 TG_INBOUND_SECRET = os.getenv("TG_INBOUND_SECRET", "")
 
 
 app = FastAPI(title="TennisGo Telegram Gateway", version="1.0.0")
 
-# CORS (set ALLOW_ORIGINS env as comma-separated list or leave * for dev)
+
 allow_origins = os.getenv("ALLOW_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -27,13 +27,13 @@ app.add_middleware(
 
 
 class LeadPayload(BaseModel):
-    # Common fields from forms
+
     name: str | None = None
     phone: str | None = None
     email: str | None = None
     topic: str | None = None
     message: str | None = None
-    # Extra/optional
+
     level: str | None = None
     location: str | None = None
     loc: str | None = None
@@ -86,7 +86,7 @@ def health():
 
 @app.post("/tg/send")
 def tg_send(payload: LeadPayload, x_auth: str | None = Header(default=None, alias="X-Auth")):
-    # Optional simple auth
+
     if TG_INBOUND_SECRET and x_auth != TG_INBOUND_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -95,7 +95,7 @@ def tg_send(payload: LeadPayload, x_auth: str | None = Header(default=None, alia
     return {"ok": True, "telegram": data}
 
 
-# For local debug: `python server.py`
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)), reload=False)
